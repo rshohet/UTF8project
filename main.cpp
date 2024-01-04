@@ -74,7 +74,7 @@ char* hex_to_bin(char hexDigit){
 
 char bin_to_hex(char* binary){
     char digit;
-    printf("BINARY = %s\n", binary);
+//    printf("BINARY = %s\n", binary);
 
     if (binary[0] == '0' && binary[1] == '0' && binary[2] == '0' && binary[3] == '0'){
         digit = '0';
@@ -163,24 +163,24 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
         }
         if (fullUnicode[0] == '\\') { // if input is as unicode, then strip off the \u
             fullUnicode = fullUnicode + 2;
-            printf("new input %s\n", fullUnicode);
+//            printf("new input %s\n", fullUnicode);
 
             int unic = 0;
             int len_unic = 0;
 //        char unicode[100];
             unsigned char unicode[] = "0000";
-            printf("UNICODE PRE %s\n", unicode);
+//            printf("UNICODE PRE %s\n", unicode);
             while (fullUnicode[unic] != '\\' && fullUnicode[unic] != ' ' && fullUnicode[unic] !=
                                                 '\0') { // find length of the char by stopping once hit next char or end of string
-                printf("FULL UNIC: %c %d\n", fullUnicode[unic], unic);
+//                printf("FULL UNIC: %c %d\n", fullUnicode[unic], unic);
                 unicode[unic] = fullUnicode[unic];
                 unic++;
             }
             unicode[unic] = '\0';
-            printf("UNICODE POST %s\n", unicode);
+//            printf("UNICODE POST %s\n", unicode);
             len_unic = unic;
             fullUnicode = fullUnicode + unic;
-            printf("fullunic = %s and unicode = %s\n", fullUnicode, unicode);
+//            printf("fullunic = %s and unicode = %s\n", fullUnicode, unicode);
 
             char *hexBin;
             unsigned char *binaryUTF = NULL; // used malloc for binaryUTF so I can alter the size and use that later
@@ -197,9 +197,8 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
 
             // if this unicode is called with 4 hex digits, it can be either 1, 2, or 3 bytes in UTF-8
             if (input_length == 4) {
-                printf("EQUALS 4 BYTES\n");
                 if (unicode[0] == '0' && unicode[1] == '0' && unicode[2] < '8') { // it requires 1 byte
-                    printf("1 BYTES\n");
+//                    printf("1 BYTES\n");
                     num_bytes = 1;
                     binaryUTF[0] = '0'; // first bit is 0
 
@@ -209,30 +208,30 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                     binaryUTF[++j] = hexBin[1];
                     binaryUTF[++j] = hexBin[2];
                     binaryUTF[++j] = hexBin[3];
-                    printf("ANSWER byte %s\n", binaryUTF);
+//                    printf("ANSWER byte %s\n", binaryUTF);
                     hexBin = hex_to_bin(unicode[3]);
                     binaryUTF[++j] = hexBin[0];
                     binaryUTF[++j] = hexBin[1];
                     binaryUTF[++j] = hexBin[2];
                     binaryUTF[++j] = hexBin[3];
-                    printf("ANSWER byte %s\n", binaryUTF);
+//                    printf("ANSWER byte %s\n", binaryUTF);
                 }
                 if (unicode[0] == '0' && unicode[1] < '8' && unicode[2] >= '8') { // it requires 2 bytes
-                    printf("2 BYTES\n");
+//                    printf("2 BYTES\n");
                     num_bytes = 2;
                     int binLength = 12; // length of binary string since 2 or 3 hex digits
                     int j = -1; // keep track of which binary digit we're up to in the binary array
                     for (int i = 0; i < input_length - 1; i++) { // skip the first hex digit bc always 0
                         hexBin = hex_to_bin(unicode[i + 1]); // skip the first hex digit bc always 0
-                        printf("hexBin %s\n", hexBin);
+//                        printf("hexBin %s\n", hexBin);
                         for (int k = 0;
                              k <
                              4; k++) { // go through the binary converted string and append to the full binary string
                             fullBinary[++j] = hexBin[k];
-                            printf("i = %d and k = %c and index = %d\n", i, hexBin[k], j);
+//                            printf("i = %d and k = %c and index = %d\n", i, hexBin[k], j);
                         }
                     }
-                    printf("full binaryUTF %s\n", fullBinary);
+//                    printf("full binaryUTF %s\n", fullBinary);
 
                     binaryUTF[0] = '1'; // 1st bit is 1
                     binaryUTF[1] = '1'; // 2nd bit is 1
@@ -246,34 +245,34 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                          i < binLength; i++) { // start at 1 bc for 2 byte encodings, skip the 0th bit of the 12 bits
                         if (j != 8) {
                             binaryUTF[j] = fullBinary[i];
-                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-                                   binaryUTF);
+//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
+//                                   binaryUTF);
                             j++;
                         } else if (j == 8) {// skip locations 8 and 9 and add after
                             j = 10;
                             binaryUTF[j] = fullBinary[i];
-                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-                                   binaryUTF);
+//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
+//                                   binaryUTF);
                             j++;
                         }
                     }
                 }
                 if (unicode[0] >= '1' ||
                     unicode[1] >= '8') { //'0' && unicode[1] < '8' && unicode[2] >= '8') { // it requires 3 bytes
-                    printf("3 BYTES\n");
+//                    printf("3 BYTES\n");
                     num_bytes = 3;
                     int binLength = 16; // length of binary string since 3 or 4 hex digits
                     int j = -1; // keep track of which binary digit we're up to in the binary array
                     for (int i = 0; i < input_length; i++) {
                         hexBin = hex_to_bin(unicode[i]);
-                        printf("hexBin %s\n", hexBin);
+//                        printf("hexBin %s\n", hexBin);
                         for (int k = 0;
                              k < 4; k++) {// go through the binary converted string and append to the full binary string
                             fullBinary[++j] = hexBin[k];
-                            printf("i = %d and k = %c and index = %d\n", i, hexBin[k], j);
+//                            printf("i = %d and k = %c and index = %d\n", i, hexBin[k], j);
                         }
                     }
-                    printf("full binaryUTF %s\n", fullBinary);
+//                    printf("full binaryUTF %s\n", fullBinary);
                     binaryUTF[0] = '1'; // 1st bit is 1
                     binaryUTF[1] = '1'; // 2nd bit is 1
                     binaryUTF[2] = '1'; // 3rd bit is 1
@@ -287,32 +286,31 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                     for (int i = 0; i < binLength; i++) {
                         if (j != 8 && j != 16) {
                             binaryUTF[j] = fullBinary[i];
-                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-                                   binaryUTF);
+//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
+//                                   binaryUTF);
                             j++;
                         } else if (j == 8) {// skip locations 8 and 9 and add after
                             j = 10;
                             binaryUTF[j] = fullBinary[i];
-                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-                                   binaryUTF);
+//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
+//                                   binaryUTF);
                             j++;
                         } else if (j == 16) {// skip locations 16 and 17 and add after
                             j = 18;
                             binaryUTF[j] = fullBinary[i];
-                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-                                   binaryUTF);
+//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
+//                                   binaryUTF);
                             j++;
                         }
                     }
-                    printf("BINAR UTF %s\n", binaryUTF);
+//                    printf("BINAR UTF %s\n", binaryUTF);
                     int lenUTF = my_utf8_strlen(binaryUTF);
-                    printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
+//                    printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
                 }
 
                 // if called with more than 4 hex digits, it is 4 bytes in UTF-8
             } else if (input_length > 4) {
-                printf("GREATER THAN 4 BYTES\n");
-                printf("4 BYTES\n");
+//                printf("4 BYTES\n");
                 num_bytes = 4;
                 int binLength = 21; // length of binary string since 5 or 6 hex digits
 
@@ -330,14 +328,14 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
 
                 for (; i < input_length; i++) {
                     hexBin = hex_to_bin(unicode[i]);
-                    printf("hexBin %s\n", hexBin);
+//                    printf("hexBin %s\n", hexBin);
                     for (int k = 0;
                          k < 4; k++) {// go through the binary converted string and append to the full binary string
                         fullBinary[++j] = hexBin[k];
 //                        printf("i = %d and k = %c and index = %d\n", i, hexBin[k], j);
                     }
                 }
-                printf("full binaryUTF %s\n", fullBinary);
+//                printf("full binaryUTF %s\n", fullBinary);
                 binaryUTF[0] = '1'; // 1st bit is 1
                 binaryUTF[1] = '1'; // 2nd bit is 1
                 binaryUTF[2] = '1'; // 3rd bit is 1
@@ -354,30 +352,30 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                 for (i = 0; i < binLength; i++) {
                     if (j != 8 && j != 16 && j != 24) {
                         binaryUTF[j] = fullBinary[i];
-                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
+//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 8) {// skip locations 8 and 9 and add after
                         j = 10;
                         binaryUTF[j] = fullBinary[i];
-                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
+//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 16) {// skip locations 16 and 17 and add after
                         j = 18;
                         binaryUTF[j] = fullBinary[i];
-                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
+//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 24) {// skip locations 24 and 25 and add after
                         j = 26;
                         binaryUTF[j] = fullBinary[i];
-                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
+//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     }
                 }
                 int lenUTF = my_utf8_strlen(binaryUTF);
-                printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
+//                printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
             }
-            printf("out of if\n");
-            printf("binary = %s, binaryUTF = %s\n", fullBinary, binaryUTF);
+//            printf("out of if\n");
+//            printf("binary = %s, binaryUTF = %s\n", fullBinary, binaryUTF);
 
             // convert the binaryUTF string to hex
             int lenUTF = my_utf8_strlen(binaryUTF);
@@ -393,14 +391,13 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
             int z = 0;
             for (int i = 0; i < lenUTF; i += 4) {
                 hi++;
-                printf("i = %d\n", i);
+//                printf("i = %d\n", i);
                 char bin[4];
                 for (int k = 0; k < 4; k++) { // get the 4 bits of the binaryUTF
                     bin[k] = binaryUTF[i + k];
                 }
                 char hex_dig = bin_to_hex(bin);
-                printf("i = %d, j = %d, binary = %s hex_dig = %d\n", i, j, bin, hex_dig);
-                printf("HEHHEHEHEHHEEEHHHEHEH %c\n", hex_dig);
+//                printf("i = %d, j = %d, binary = %s hex_dig = %d\n", i, j, bin, hex_dig);
 //                if (j == 2 || j == 5 || j == 8) { // skip the spaces
 ////                    hexUTF8[j++] = ' ';
 //                    continue;
@@ -409,7 +406,7 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                     temp[t++] = prev;
                     temp[t++] = hex_dig;
                     temp[t] = '\0';
-                    printf("TEMP %s\n", temp);
+//                    printf("TEMP %s\n", temp);
 
 
                     char hexEncode[3] = {temp[t-2], temp[t-1], '\0'};
@@ -417,68 +414,21 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                     sscanf(hexEncode, "%2hhX", &output[len_output]);
                     output[len_output + 1] = '\0';
                 }
-                printf("TEMP FINA%x\n", temp);
+//                printf("TEMP FINA%x\n", temp);
                 prev = hex_dig;
                 hexUTF8[j++] = hex_dig;
             }
 
-//            unsigned char *letter = nullptr;
-//            hexUTF8[j] = '\0'; // Null-terminate the hex string
-//            char hexEncode[3] = {hexUTF8[0], hexUTF8[1], '\0'};
-//            int len_output = my_utf8_strlen(output);
-//            printf("Here is hex %s len outout = %d\n", hexEncode, len_output);
-////            sscanf(hexPair, "%2hhX", &letters[p]);
-////            printf("Here is letters %c\n", letters[p]);
-//            sscanf(hexEncode, "%2hhX", &output[len_output + x]);
-//            output[loop + 1] = '\0';
-//            printf("Here is letters %x\n", output[len_output + x]);
-//            p++;
-//            x++;
-//            output[len_output + x] = '\0';
-//            for (int c = 0; c < my_utf8_strlen(hexUTF8); c+=1) {
-//                output[loop + c] = hexUTF8[c];
-//                printf("HEX UTF8 %s\n", hexUTF8);
-//                printf("LOPP I c=%d output=%s bini=%c hexi=%c\n", c, output, binaryUTF[c], hexUTF8[c]);
-//            }
-//            output[loop + my_utf8_strlen(hexUTF8)] = '\0'; // need to terminate w null
-//            for (int c = 0; c <=p; c++){
-//                output[loop + c] = {letters[c], letters[c+1], '\0'};
-
-//            }
-            printf("OUTPUT %s\n", output);
+//            printf("OUTPUT %s\n", output);
             free(binaryUTF);
             loop = loop + my_utf8_strlen(hexUTF8);
-//            if (fullUnicode[0] !=
-//                '\0') { // add a space between the encoding of each character, so long as not the last one
-//                output[loop] = ' ';
-//                loop++;
-//            }
+
         }
-//            unsigned char *letter = nullptr;
-//            hexUTF8[j] = '\0'; // Null-terminate the hex string
-//            char hexPair[3] = {hexUTF8[0], hexUTF8[1], '\0'};
-//            printf("Here is hex %s\n", hexPair);
-//            sscanf(hexPair, "%2hhX", &letter[0]);
-//            printf("Here is hex %c\n", letter);
-//            for (int c = 0; c < my_utf8_strlen(hexUTF8); c+=1) {
-//                output[loop + c] = hexUTF8[c];
-//                printf("HEX UTF8 %s\n", hexUTF8);
-//                printf("LOPP I c=%d output=%s bini=%c hexi=%c\n", c, output, binaryUTF[c], hexUTF8[c]);
-//            }
-//            output[loop + my_utf8_strlen(hexUTF8)] = '\0'; // need to terminate w null
-//            printf("OUTPUT %s\n", output);
-//            free(binaryUTF);
-//            loop = loop + my_utf8_strlen(hexUTF8);
-//            if (fullUnicode[0] !=
-//                '\0') { // add a space between the encoding of each character, so long as not the last one
-//                output[loop] = ' ';
-//                loop++;
-//            }
-//        }
+
         else{ // it's a real character
             int i = 0;
             char hexchar[3];
-            printf("UNIC CHAR = %c\n", fullUnicode[0]);
+//            printf("UNIC CHAR = %c\n", fullUnicode[0]);
             int len_output = regular_strlen(output);
             output[len_output] = fullUnicode[0];
             output[len_output+1] = '\0';
@@ -487,17 +437,6 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
             fullUnicode = fullUnicode + 1;
             int full_len = regular_strlen(fullUnicode);
 
-//            int a = (fullUnicode[0]) - 'A' + 10;
-//            output[loop] = ((int)fullUnicode[0]) - 'A' + 10;
-//            while (fullUnicode[i] != '\0') {
-
-//                hexchar[i] = fullUnicode[i];
-//                printf("out char = %d\n", a);
-//                i++;
-//                loop++;
-//            }
-//            hexchar[i] = '\0';
-//            printf("OUTPUT %x\n", hexchar);
         }
         while_int++;
 
@@ -578,6 +517,23 @@ unsigned char* my_utf8_charat(unsigned char* string, int index) {
 
 int my_utf8_strcmp(unsigned char *string1, unsigned char *string2){
     int i = 0;
+    printf("LENGTH %d %s\n", my_utf8_strlen(string2), string2);
+    if (my_utf8_strlen(string1) == 1 && my_utf8_strlen(string2) == 1){
+        printf("here\n");
+        if (string1[0] < string2[0]) {
+            printf("1: string1 %s is before string2 %s\n", string1,
+                   string2); // need to write string bc prints weird in hebrew
+            return 1;
+        } else if (string1[0] > string2[0]){
+            printf("-1: string1 %s is after string2 %s\n", string1,
+                   string2); // need to write string bc prints weird in hebrew
+            return -1;
+        }else{
+            printf("0: string1 %s = string2 %s\n", string1,
+                   string2);
+            return 0;
+        }
+    }
     // while we haven't reached the end of either string
     while (string1[i] != '\0' && string2[i] != '\0'){
         if (string1[i] < string2[i]){
@@ -920,6 +876,19 @@ int my_utf8_decode(unsigned char *input, unsigned char *output){
     return 0;
 }
 
+//test encode
+int test_encode(unsigned char *input, unsigned char *expected) {
+    unsigned char output[100] = {0};
+    printf("expected = %s\n", expected);
+    my_utf8_encode(input, output);
+    if (my_utf8_strcmp(output, expected) == 0) {
+        printf("SUCCESS: %s -> %s\n", input, output);
+        return 1;
+    } else {
+        printf("FAILURE: %s -> %s (expected %s)\n", input, output, expected);
+        return 0;
+    }
+}
 
 int main(void) {
 
@@ -1010,21 +979,24 @@ int main(void) {
 //    printf("ANSWER IS %s\n", output);
 
 
+    printf("TESTING ENCODE: \n");
+    unsigned char i[] = "\\u01D1";
+    unsigned char o[] = {0xC7, 0x91, '\0'};
+    test_encode(i, o);
 
-//    unsigned char s1[] = "ǐ";
-//    my_utf8_encode(s1, output); // C7 90
-//    printf("ANSWER %s\n", output);
-//    printf("\n");
 
-//    unsigned char s1[] = "\\u0001"; // 01
-//    my_utf8_encode(s1, output); // 1 byte ones need to be b4 2 byte ones bc output gets messed up
-//    printf("ANSWER %s\n", output);
-//    printf("\n");
+    unsigned char i1[] = "\\u0080";
+    unsigned char o1[] = {0xC2, 0x80, '\0'};
+    test_encode(i1, o1);
+//
+//    unsigned char i2[] = "\\u0021"; /// doesnr work
+//    unsigned char o2[] = "!";
+//    test_encode(i2, output);
 
-//    unsigned char s1[] = "\\u0001"; // 01
-//    my_utf8_encode("\\u0008\\u0061", output); // 08 61
-//    printf("ANSWER %s\n", output);
-//    printf("\n");
+
+    unsigned char i2[] = "\\u0008\\u0061"; // 01
+    unsigned char o2[] = {0x08, 0x61, '\0'}; // it's backspace a, so should just be a
+    test_encode(i2, o2);
 
 
 //    unsigned char s1[] = "\\u0001"; // 01
@@ -1042,7 +1014,6 @@ int main(void) {
 //    printf("ANSWER %s\n", output);
 //    printf("\n");
 
-//    unsigned char s1[] = "\\u0080";
 //    my_utf8_encode(s1, output); // C2 80
 //    printf("ANSWER %s\n", output);
 //    printf("\n");
@@ -1117,15 +1088,15 @@ int main(void) {
 //    printf("ANSWER %s\n", output);
 //    printf("\n");
 
-//    unsigned char b[] = "HELLO \\u05D0\\u05E8\\u05D9\\u05D4 \\u1F601"; // HELLOאריה😁
+//    unsigned char b[] = "HELLO \\u05D0\\u05E8\\u05D9\\u05D4 \\u1F601"; // HELLO אריה 😁
 //    my_utf8_encode(b, output);
 //    printf("ANSWER %s\n", output);
 //    printf("\n");
 
-    unsigned char b[] = "HELLO \\u05D0\\u05E8\\u05D9\\u05D4 Hello"; // HELLOאריה😁
-    my_utf8_encode(b, output);
-    printf("ANSWER %s\n", output);
-    printf("\n");
+//    unsigned char b[] = "HELLO \\u05D0\\u05E8\\u05D9\\u05D4 Hello"; // HELLO אריה Hello
+//    my_utf8_encode(b, output);
+//    printf("ANSWER %s\n", output);
+//    printf("\n");
 
 //    unsigned char b[] = "\\u05E8\\u05D9\\u05D4HELLO"; // HELLO D7 A8 D7 99 D7 94 - HELLO ריה
 //    my_utf8_encode(b, output); // FIX THISSSSSSSSS
