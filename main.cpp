@@ -938,8 +938,10 @@ int main(void) {
     test_strlen(len3, 5); //5
     unsigned char len4[] = "How are you אריה ? 😀";
     test_strlen(len4, 20); //20
-    unsigned char len5[] = "";
-    test_strlen(len5, 0); //0
+    unsigned char len5[] = "🥳😊";
+    test_strlen(len5, 2); //0
+    unsigned char len6[] = "";
+    test_strlen(len6, 0); //0
 
 
 //    printf("TESTING SUBSTRNG:");
