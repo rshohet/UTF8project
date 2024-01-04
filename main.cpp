@@ -120,10 +120,33 @@ int num_bytes(unsigned char string) {
         printf("Invalid: %c\n", string);
     return bytes; // return the number of bytes the char is
 }
+
+int num_byte_unic(unsigned char *input){
+    int bytes = 0;
+    if (input[0] == '0' && input[1] == '0') { // either 1 or 2 bytes
+        if (input[2] >= '0' && input[2] <= '7') // this means 1 byte 0001 - 007F
+            bytes = 1;
+        else if (input[2] == '8' || input[2] == '9' || (input[2] >= 'A' && input[2] <= 'F')) // this means 2 bytes 0080
+            bytes = 2;
+    } else if (input[0] == '0' && (input[1] >= '0' && input[1] <= '7')) { // this means 2 bytes 07FF
+        bytes = 2;
+    } else if (input[0] == '0' && (input[1] == '8' || input[1] == '9'|| (input[2] >= 'A' && input[2] <= 'F'))){ // this  is 3 bytes 0800 - 0FFF
+        bytes = 3;
+    } else if ((input[0] >= '1' && input[0] <= '9') || (input[0] >= 'A' && input[0] <= 'F')){ // this  is 3 bytes 1000 - FFFF
+        bytes = 3;
+    } else if (input[0] >= 0xC2 && input[0] <= 0xDF) { // this means the ith char is 2 bytes
+        bytes = 2;
+    }else
+        printf("Invalid: %c\n", input[0]);
+    return bytes; // return the number of bytes the char is
+}
+
 int my_utf8_encode(unsigned char *input, unsigned char *output) {
     int loop = 0;
     int while_int = 0;
     unsigned char *fullUnicode = input;
+    int p = 0;
+    unsigned char letters[50];
     while (fullUnicode[while_int] != '\0') {
         if (fullUnicode[0] == '\\') { // if input is as unicode, then strip off the \u
             fullUnicode = fullUnicode + 2;
@@ -351,6 +374,7 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
             temp[0] = '\\';
             temp[1] = 'x';
             int t = 2;
+            int x = 0;
             int j = 0; // keep track of where in hex array we are
             char prev;
             for (int i = 0; i < lenUTF; i += 4) {
@@ -378,25 +402,59 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                 hexUTF8[j++] = hex_dig;
             }
 
+//            unsigned char *letter = nullptr;
+//            hexUTF8[j] = '\0'; // Null-terminate the hex string
+            char hexEncode[3] = {hexUTF8[0], hexUTF8[1], '\0'};
+            int len_output = my_utf8_strlen(output);
+            printf("Here is hex %s len outout = %d\n", hexEncode, len_output);
+//            sscanf(hexPair, "%2hhX", &letters[p]);
+//            printf("Here is letters %c\n", letters[p]);
+            sscanf(hexEncode, "%2hhX", &output[len_output + x]);
+            output[loop + 1] = '\0';
+            printf("Here is letters %c\n", output[len_output + x]);
+            p++;
+            x++;
+            output[len_output + x] = '\0';
+//            for (int c = 0; c < my_utf8_strlen(hexUTF8); c+=1) {
+//                output[loop + c] = hexUTF8[c];
+//                printf("HEX UTF8 %s\n", hexUTF8);
+//                printf("LOPP I c=%d output=%s bini=%c hexi=%c\n", c, output, binaryUTF[c], hexUTF8[c]);
+//            }
+//            output[loop + my_utf8_strlen(hexUTF8)] = '\0'; // need to terminate w null
+//            for (int c = 0; c <=p; c++){
+//                output[loop + c] = {letters[c], letters[c+1], '\0'};
 
-            hexUTF8[j] = '\0'; // Null-terminate the hex string
-
-            printf("Here is hex %s\n", hexUTF8);
-            for (int c = 0; c < my_utf8_strlen(hexUTF8); c+=1) {
-                output[loop + c] = hexUTF8[c];
-                printf("HEX UTF8 %s\n", hexUTF8);
-                printf("LOPP I c=%d output=%s bini=%c hexi=%c\n", c, output, binaryUTF[c], hexUTF8[c]);
-            }
-            output[loop + my_utf8_strlen(hexUTF8)] = '\0'; // need to terminate w null
+//            }
             printf("OUTPUT %s\n", output);
             free(binaryUTF);
             loop = loop + my_utf8_strlen(hexUTF8);
-            if (fullUnicode[0] !=
-                '\0') { // add a space between the encoding of each character, so long as not the last one
-                output[loop] = ' ';
-                loop++;
-            }
+//            if (fullUnicode[0] !=
+//                '\0') { // add a space between the encoding of each character, so long as not the last one
+//                output[loop] = ' ';
+//                loop++;
+//            }
         }
+//            unsigned char *letter = nullptr;
+//            hexUTF8[j] = '\0'; // Null-terminate the hex string
+//            char hexPair[3] = {hexUTF8[0], hexUTF8[1], '\0'};
+//            printf("Here is hex %s\n", hexPair);
+//            sscanf(hexPair, "%2hhX", &letter[0]);
+//            printf("Here is hex %c\n", letter);
+//            for (int c = 0; c < my_utf8_strlen(hexUTF8); c+=1) {
+//                output[loop + c] = hexUTF8[c];
+//                printf("HEX UTF8 %s\n", hexUTF8);
+//                printf("LOPP I c=%d output=%s bini=%c hexi=%c\n", c, output, binaryUTF[c], hexUTF8[c]);
+//            }
+//            output[loop + my_utf8_strlen(hexUTF8)] = '\0'; // need to terminate w null
+//            printf("OUTPUT %s\n", output);
+//            free(binaryUTF);
+//            loop = loop + my_utf8_strlen(hexUTF8);
+//            if (fullUnicode[0] !=
+//                '\0') { // add a space between the encoding of each character, so long as not the last one
+//                output[loop] = ' ';
+//                loop++;
+//            }
+//        }
         else{ // it's a real character
             int i = 0;
             char hexchar[3];
@@ -843,9 +901,9 @@ int main(void) {
 //    unsigned char* ans = my_utf8_substring(s, 7, 12); //אaריdה
 //    printf("substring is %s\n", ans);
 
-    unsigned char s1[] = "א•שלי";
-    unsigned char* ans1 = my_utf8_substring(s1, 0, 2); //א•ש
-    printf("character is %s\n", ans1);
+//    unsigned char s1[] = "א•שלי";
+//    unsigned char* ans1 = my_utf8_substring(s1, 0, 2); //א•ש
+//    printf("character is %s\n", ans1);
 
 //    unsigned char s2[] = "שeלוAם אaריdה שלום";
 //    unsigned char* ans2 = my_utf8_substring(s2, 0, 2); //לeש
@@ -1028,10 +1086,10 @@ int main(void) {
 //    printf("ANSWER %s\n", output);
 //    printf("\n");
 
-//    unsigned char b[] = "HELLO\\u05E8\\u05D9\\u05D4"; // HELLO D7 A8 D7 99 D7 94 - HELLO ריה
-//    my_utf8_encode(b, output); // FIX THISSSSSSSSS
-//    printf("ANSWER %s\n", output);
-//    printf("\n");
+    unsigned char b[] = "HELLO\\u05E8\\u05D9\\u05D4"; // HELLO D7 A8 D7 99 D7 94 - HELLO ריה
+    my_utf8_encode(b, output); // FIX THISSSSSSSSS
+    printf("ANSWER %s\n", output);
+    printf("\n");
 
 //    unsigned char b[] = "\\u05E8\\u05D9\\u05D4HELLO"; // HELLO D7 A8 D7 99 D7 94 - HELLO ריה
 //    my_utf8_encode(b, output); // FIX THISSSSSSSSS
