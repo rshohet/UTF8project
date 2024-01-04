@@ -2,7 +2,6 @@
 // Created by Rachel Shohet on 12/29/23.
 #include <string.h>
 #include <stdio.h>
-#include <malloc/_malloc.h>
 #include <stdlib.h>
 
 int regular_strlen(unsigned char *string){
