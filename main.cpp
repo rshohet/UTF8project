@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// calculate the length of a string based on bytes
 int regular_strlen(unsigned char *string){
     int len = 0;
     while (string[len] != '\0'){
@@ -8,6 +9,8 @@ int regular_strlen(unsigned char *string){
     }
     return len;
 }
+
+// calculate the length of a string based on characters
 int my_utf8_strlen(unsigned char *string){
     int i = 0;
     int length = 0;
@@ -28,10 +31,10 @@ int my_utf8_strlen(unsigned char *string){
             length += 1;
         }
     }
-
     return length;
 }
 
+// convert hex digit to binary (4 bits)
 char* hex_to_bin(char hexDigit){
     int num;
     char *binArr[16] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110",
@@ -64,9 +67,9 @@ char* hex_to_bin(char hexDigit){
     return binArr[num];
 }
 
+// convert binary (4 bits) to hex
 char bin_to_hex(char* binary){
     char digit;
-//    printf("BINARY = %s\n", binary);
 
     if (binary[0] == '0' && binary[1] == '0' && binary[2] == '0' && binary[3] == '0'){
         digit = '0';
@@ -101,25 +104,26 @@ char bin_to_hex(char* binary){
     } else if (binary[0] == '1' && binary[1] == '1' && binary[2] == '1' && binary[3] == '1') {
         digit = 'F';
     }
-//    printf("HEX DIGIT %c\n", digit + '0');
     return digit;
 }
 
+// calculates the number of bytes a character is based on the first byte
 int num_bytes(unsigned char string) {
     int bytes = 0;
-    if (string >= 0x00 && string <= 0x7F) { // this means the ith char is 1 byte
+    if (string >= 0x00 && string <= 0x7F) { // this means the char is 1 byte
         bytes = 1;
-    } else if (string >= 0xF0 && string <= 0xF4) { // this means the ith char is 4 bytes
+    } else if (string >= 0xF0 && string <= 0xF4) { // this means the char is 4 bytes
         bytes = 4;
-    } else if (string >= 0xE0 && string <= 0xEF) { // this means the ith char is 3 bytes
+    } else if (string >= 0xE0 && string <= 0xEF) { // this means the char is 3 bytes
         bytes = 3;
-    } else if (string >= 0xC2 && string <= 0xDF) { // this means the ith char is 2 bytes
+    } else if (string >= 0xC2 && string <= 0xDF) { // this means the char is 2 bytes
         bytes = 2;
     }else
         return -1;
     return bytes; // return the number of bytes the char is
 }
 
+// calculates the number of bytes a unicode is based on the first digit
 int num_byte_unic(unsigned char *input){
     int bytes = 0;
     if (input[0] == '0' && input[1] == '0') { // either 1 or 2 bytes
@@ -137,36 +141,28 @@ int num_byte_unic(unsigned char *input){
         bytes = 2;
     }else
         printf("Invalid: %c\n", input[0]);
-    return bytes; // return the number of bytes the char is
+    return bytes;
 }
 
+// Encoding a UTF8 string, taking as input an ASCII string, with UTF8 characters encoded using the Codepoint numbering
+// scheme notation, and returns a UTF8 encoded string.
 int my_utf8_encode(unsigned char *input, unsigned char *output) {
     int loop = 0;
     int while_int = 0;
     unsigned char *fullUnicode = input;
-    unsigned char letters[50];
     while (regular_strlen(fullUnicode) > 0) {
-        if (fullUnicode[0] == ' ') {
-            int len_out = regular_strlen(output);
-            output[len_out] = ' ';
-            output[len_out + 1] = '\0';
-            fullUnicode = fullUnicode + 1;
-        }
-        if (fullUnicode[0] == '\\') { // if input is as unicode, then strip off the \u
-            fullUnicode = fullUnicode + 2;
+        if (fullUnicode[0] == '\\') { // if input is as unicode
+            fullUnicode = fullUnicode + 2; // strip off the \u
 //            printf("new input %s\n", fullUnicode);
 
             int unic = 0;
             unsigned char unicode[] = "0000";
-//            printf("UNICODE PRE %s\n", unicode);
             while (fullUnicode[unic] != '\\' && fullUnicode[unic] != ' ' && fullUnicode[unic] !=
                                                 '\0') { // find length of the char by stopping once hit next char or end of string
-//                printf("FULL UNIC: %c %d\n", fullUnicode[unic], unic);
                 unicode[unic] = fullUnicode[unic];
                 unic++;
             }
             unicode[unic] = '\0';
-//            printf("UNICODE POST %s\n", unicode);
             fullUnicode = fullUnicode + unic;
 
             char *hexBin;
@@ -232,14 +228,10 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                          i < binLength; i++) { // start at 1 bc for 2 byte encodings, skip the 0th bit of the 12 bits
                         if (j != 8) {
                             binaryUTF[j] = fullBinary[i];
-//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-//                                   binaryUTF);
                             j++;
                         } else if (j == 8) {// skip locations 8 and 9 and add after
                             j = 10;
                             binaryUTF[j] = fullBinary[i];
-//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-//                                   binaryUTF);
                             j++;
                         }
                     }
@@ -285,13 +277,10 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                         } else if (j == 16) {// skip locations 16 and 17 and add after
                             j = 18;
                             binaryUTF[j] = fullBinary[i];
-//                            printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j,
-//                                   binaryUTF);
                             j++;
                         }
                     }
-                    int lenUTF = my_utf8_strlen(binaryUTF);
-//                    printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
+
                 }
 
                 // if called with more than 4 hex digits, it is 4 bytes in UTF-8
@@ -338,30 +327,23 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                 for (i = 0; i < binLength; i++) {
                     if (j != 8 && j != 16 && j != 24) {
                         binaryUTF[j] = fullBinary[i];
-//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 8) {// skip locations 8 and 9 and add after
                         j = 10;
                         binaryUTF[j] = fullBinary[i];
-//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 16) {// skip locations 16 and 17 and add after
                         j = 18;
                         binaryUTF[j] = fullBinary[i];
-//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     } else if (j == 24) {// skip locations 24 and 25 and add after
                         j = 26;
                         binaryUTF[j] = fullBinary[i];
-//                        printf("i = %d and adding %c and count = %d and full is %s \n", i, fullBinary[i], j, binaryUTF);
                         j++;
                     }
                 }
-//                int lenUTF = my_utf8_strlen(binaryUTF);
-//                printf("binary = %s, binaryUTF = %s, length of utf = %d\n", fullBinary, binaryUTF, lenUTF);
             }
-//            printf("out of if\n");
-//            printf("binary = %s, binaryUTF = %s\n", fullBinary, binaryUTF);
+
 
             // convert the binaryUTF string to hex
             int lenUTF = my_utf8_strlen(binaryUTF);
@@ -380,8 +362,9 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                 for (int k = 0; k < 4; k++) { // get the 4 bits of the binaryUTF
                     bin[k] = binaryUTF[i + k];
                 }
-                char hex_dig = bin_to_hex(bin);
+                char hex_dig = bin_to_hex(bin); // so have the hex digit
 
+                // if we passed 2 hex digits, then it is 1 byte and convert it to a character and add to the output string
                 if (hi % 2 == 0){
                     temp[t++] = prev;
                     temp[t++] = hex_dig;
@@ -394,7 +377,7 @@ int my_utf8_encode(unsigned char *input, unsigned char *output) {
                     output[len_output + 1] = '\0';
                 }
                 prev = hex_dig;
-                hexUTF8[j++] = hex_dig;
+//                hexUTF8[j++] = hex_dig;
             }
             free(binaryUTF);
             loop = loop + my_utf8_strlen(hexUTF8);
