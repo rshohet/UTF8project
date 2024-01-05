@@ -466,6 +466,7 @@ unsigned char* my_utf8_charat(unsigned char* string, int index) {
 }
 
 
+//Returns whether the two strings are the same
 int my_utf8_strcmp(unsigned char *string1, unsigned char *string2){
     int i = 0;
     if (my_utf8_strlen(string1) == 1 && my_utf8_strlen(string2) == 1){
@@ -512,7 +513,7 @@ int my_utf8_strcmp(unsigned char *string1, unsigned char *string2){
     }
 }
 
-
+// take a string and copy it from the  beginning of it until the desired number of characters and append it to destination
 int my_utf8_strncpy(unsigned char *dest, unsigned char *source, int num_char) {
     int i = 0; // to loop through the bytes of the string
     int j = 0; // to loop through the actual characters of the string
@@ -547,6 +548,7 @@ int my_utf8_strncpy(unsigned char *dest, unsigned char *source, int num_char) {
     return 1;
 }
 
+// count how many times a character appeared in the string
 int my_utf8_chr_count(unsigned char* str, unsigned char* ch){
     // check how many bytes the input character is
     int bytes = 0;
@@ -580,6 +582,8 @@ int my_utf8_chr_count(unsigned char* str, unsigned char* ch){
     return seen;
 }
 
+
+// return a substring of a string from the start index to the end index
 unsigned char* my_utf8_substring(unsigned char* string, int start, int end){
     unsigned char* new_string = my_utf8_charat(string, start); // use my_utf8_charat to get the char at the start index, so the string begins at that character
 //    printf("string = %s\n", new_string);
@@ -587,16 +591,10 @@ unsigned char* my_utf8_substring(unsigned char* string, int start, int end){
     int bytes = 0; // bytes of the chars thus far in the string
     int len = end - start + 1; // length of the substring
     while ((j < len) && new_string[bytes] != '\0') {
-//        if (j == 0 || j % 2 == 0) {
-            bytes += num_bytes(new_string[bytes]); // strip off one character from the string at a time until find the index and do this by incrementing by how many bytes the char is
-//            printf("J = %d and bytes = %d sub = %s \n", j, bytes, new_string);
-//        }
+        bytes += num_bytes(new_string[bytes]); // strip off one character from the string at a time until find the index and do this by incrementing by how many bytes the char is
         j++;
     }
-//    printf("J = %d sub  = %c \n", j, new_string[j]);
-    int last_byte = num_bytes(new_string[j]);
     new_string[bytes] = '\0'; // need to terminate w null character
-//    printf("SUBSTRING = %s\n", new_string);
     return new_string;
 }
 
@@ -622,10 +620,9 @@ int my_utf8_decode(unsigned char *input, unsigned char *output){
         if (input[index1] != '\0') { // if not at the end of the input string
             index1 += 1; // increment by 2 so always at the beginning of a new byte of the utf string and then add 1 for spaces between bytes
         }
-//        index1 += 1;
-//        printf("HEX %s \n", hex);
-//        printf("INPUT INDEXXXX input = %s ind = %d prev = %c inputind = %c\n", input, index1, prev, input[index1]); // index1 shld be 3, 6, 9...
-        while ((prev == 'C' || prev == 'D' || prev == 'E' || prev == 'F') && ((input[index1] >= '0' && input[index1] <= '9') || ( input[index1] == 'A' ||  input[index1] == 'B'))){ // until reach next hex that signals a new char
+
+        // loop until reach next hex that signals a new char
+        while ((prev == 'C' || prev == 'D' || prev == 'E' || prev == 'F') && ((input[index1] >= '0' && input[index1] <= '9') || ( input[index1] == 'A' ||  input[index1] == 'B'))){
 //            printf("WHILE\n");
             hex[h++] = ' ';// add spaces between each byte
 
@@ -637,9 +634,8 @@ int my_utf8_decode(unsigned char *input, unsigned char *output){
 //            printf("HERE IS HEX %s index = %d \n", hex, index1);
 
         }
+        // now have the full charachter in hex
         hex[h] = '\0'; // need to terminate w null character
-        int len_hex = my_utf8_strlen(hex);
-//        printf("HERE IS HEX %s len = %d \n", hex, len_hex);
 
         // check how many bytes the input utf8 is
         int bytes = 0;
@@ -670,14 +666,14 @@ int my_utf8_decode(unsigned char *input, unsigned char *output){
                     binary[j] = '0';
                 }
 
-                utf_len = (bytes * 2) + (bytes - 1); // the length of the utf8 string is 2 bytes, each with 2 hex digits + (bytes - 1) for the space
+                utf_len = (bytes * 2) + (bytes - 1); // the length of the utf8 string is bytes, each with 2 hex digits + (bytes - 1) for the space
                 for (int i = 0; i < utf_len; i++) {
                     // skip the spaces
                     if (i == 2) // skip the spaces in the utf8 string
                         continue;
                     else {
                         // convert the hex to binary
-                        char *bin = hex_to_bin(hex[i]);
+                        char *bin = hex_to_bin(hex[i]); // convert the hex to binary - but this will be UTF8 binary
                         if (i == 0) { // if it's the first utf digit, we only want the last bit of its conversion (bc 110 is a given)
                             binary[j++] = bin[3];
                         } else if (i == 1 || i == 4) { // the 2nd utf digit and the last are completely added
@@ -727,9 +723,7 @@ int my_utf8_decode(unsigned char *input, unsigned char *output){
                 bytes = 4;
                 utf_len = (bytes * 2) + (bytes -
                                          1); // the length of the utf8 string is 2 bytes, each with 2 hex digits + (bytes - 1) for the space
-//                binary[0] = '0'; // the 0th binary digit is always a 0
-//                binary[1] = '0'; // the 1st binary digit is always a 0
-//                binary[2] = '0'; // the 2nd binary digit is always a 0
+
                 int j = 0; // keep track of where we are at in the binary string
                 for (int i = 1; i < utf_len; i++) { // completely skip first utf char since it's always 1111
                     // skip the spaces
